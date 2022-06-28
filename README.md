@@ -1,3 +1,3 @@
 # Obsidian-jME
 
-Implementation of the 
+Implementation of the Obsidian JavaFX embedding API for jME applications.
