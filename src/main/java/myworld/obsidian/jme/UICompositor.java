@@ -35,7 +35,7 @@ public class UICompositor extends Filter {
 
     @Override
     protected void initFilter(AssetManager manager, RenderManager renderManager, ViewPort vp, int w, int h) {
-        material = new Material(manager, "myworld/client/gui/jfx/UICompositor.j3md");
+        material = new Material(manager, "myworld/obsidian/jme/UICompositor.j3md");
         material.setInt("PixelFormatARGB", PIXEL_FORMAT_ARGB);
         material.setInt("PixelFormatBGRA_PRE", PIXEL_FORMAT_BGRA_PRE);
         if(format != null){
