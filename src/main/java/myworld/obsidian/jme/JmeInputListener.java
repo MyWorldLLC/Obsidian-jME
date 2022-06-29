@@ -21,17 +21,17 @@ import com.jme3.input.RawInputListener;
 import com.jme3.input.awt.AwtKeyInput;
 import com.jme3.input.event.*;
 import myworld.obsidian.InputHandler;
-import myworld.obsidian.ObsidianUI;
+import myworld.obsidian.jfx.ObsidianJfxUI;
 import myworld.obsidian.input.MouseButton;
 import myworld.obsidian.input.MouseWheelAxis;
 
 public class JmeInputListener implements RawInputListener {
 
-    protected final ObsidianUI ui;
+    protected final ObsidianJfxUI ui;
     protected final InputHandler handler;
     protected boolean consumeEvents;
 
-    public JmeInputListener(ObsidianUI ui, InputHandler handler){
+    public JmeInputListener(ObsidianJfxUI ui, InputHandler handler){
         this.ui = ui;
         this.handler = handler;
     }

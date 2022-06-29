@@ -22,7 +22,7 @@ import com.jme3.post.Filter;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.texture.Texture2D;
-import myworld.obsidian.swapchain.Swapchain;
+import myworld.obsidian.jfx.swapchain.Swapchain;
 
 public class UICompositor extends Filter {
 

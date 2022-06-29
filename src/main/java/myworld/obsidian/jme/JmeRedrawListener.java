@@ -23,7 +23,7 @@ import com.jme3.texture.Texture2D;
 import com.jme3.texture.image.ColorSpace;
 import com.jme3.util.BufferUtils;
 import myworld.obsidian.ObsidianPixels;
-import myworld.obsidian.RedrawListener;
+import myworld.obsidian.jfx.RedrawListener;
 
 import java.nio.ByteOrder;
 

@@ -65,7 +65,7 @@ dependencies {
     implementation "org.jmonkeyengine:jme3-desktop:$jmeVersion"
     implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
 
-    api "com.myworldvw:obsidian:1.0.1"
+    api "com.myworldvw:obsidian:1.0.1-SNAPSHOT"
 }
 
 java {
