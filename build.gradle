@@ -45,6 +45,13 @@ version = getGitVersion()
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        url 'https://maven.pkg.github.com/MyWorldLLC/Packages'
+        credentials {
+            username System.getenv("GITHUB_USER") ?: gitCredentials["username"]
+            password System.getenv("GITHUB_TOKEN") ?: gitCredentials["password"]
+        }
+    }
 }
 
 dependencies {
