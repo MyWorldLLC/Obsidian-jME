@@ -24,7 +24,7 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.texture.Texture2D;
 import myworld.obsidian.jfx.swapchain.Swapchain;
 
-public class UICompositor extends Filter {
+public class JfxCompositor extends Filter {
 
     public static final int PIXEL_FORMAT_ARGB = 0;
     public static final int PIXEL_FORMAT_BGRA_PRE = 1;
@@ -35,7 +35,7 @@ public class UICompositor extends Filter {
 
     @Override
     protected void initFilter(AssetManager manager, RenderManager renderManager, ViewPort vp, int w, int h) {
-        material = new Material(manager, "myworld/obsidian/jme/UICompositor.j3md");
+        material = new Material(manager, "myworld/obsidian/jme/JfxCompositor.j3md");
         material.setInt("PixelFormatARGB", PIXEL_FORMAT_ARGB);
         material.setInt("PixelFormatBGRA_PRE", PIXEL_FORMAT_BGRA_PRE);
         if(format != null){

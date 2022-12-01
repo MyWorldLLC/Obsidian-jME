@@ -1,0 +1,29 @@
+MaterialDef UICompositor {
+
+    MaterialParameters {
+        Texture2D Texture
+        Texture2D UITexture
+        Texture2D DepthTexture
+        Int PixelFormat
+        Int PixelFormatARGB
+        Int PixelFormatBGRA_PRE
+        Int NumSamples
+        Int NumSamplesDepth
+    }
+
+    Technique {
+        VertexShader GLSL150 GLSL100: Common/MatDefs/Post/Post.vert
+        FragmentShader GLSL150 GLSL100: myworld/obsidian/jme/JfxCompositor.frag
+
+        WorldParameters {
+        }
+
+        Defines {
+            FORMAT_ARGB : PixelFormatARGB
+            FORMAT_BGRA_PRE : PixelFormatBGRA_PRE
+            RESOLVE_MS : NumSamples
+            RESOLVE_DEPTH_MS : NumSamplesDepth
+        }
+    }
+
+}

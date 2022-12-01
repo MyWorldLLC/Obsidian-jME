@@ -31,9 +31,9 @@ public class JmeRedrawListener implements RedrawListener {
 
     protected Texture2D uiTexture;
     protected final Application app;
-    protected final UICompositor compositor;
+    protected final JfxCompositor compositor;
 
-    public JmeRedrawListener(Application app, UICompositor compositor){
+    public JmeRedrawListener(Application app, JfxCompositor compositor){
         this.app = app;
         this.compositor = compositor;
     }
@@ -42,7 +42,7 @@ public class JmeRedrawListener implements RedrawListener {
         return app;
     }
 
-    public UICompositor getCompositor(){
+    public JfxCompositor getCompositor(){
         return compositor;
     }
 

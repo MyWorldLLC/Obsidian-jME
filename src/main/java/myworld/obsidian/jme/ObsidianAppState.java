@@ -23,13 +23,17 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
-import com.jme3.util.NativeObject;
 import myworld.obsidian.ObsidianUI;
+import myworld.obsidian.display.ColorRGBA;
+import myworld.obsidian.display.Colors;
 import myworld.obsidian.display.DisplayEngine;
 import myworld.obsidian.display.skin.chipmunk.ChipmunkSkinLoader;
 import myworld.obsidian.geometry.Dimension2D;
 
 import java.util.function.BiConsumer;
+
+import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
+import static org.lwjgl.opengl.GL11.glGetError;
 
 public class ObsidianAppState extends BaseAppState {
 
@@ -40,9 +44,11 @@ public class ObsidianAppState extends BaseAppState {
     protected BiConsumer<ObsidianUI, ObsidianUI> readyListener;
 
     protected FilterPostProcessor filters;
+
+    protected FrameBuffer renderBuffer;
     protected FrameBuffer uiFrameBuffer;
     protected Texture2D uiTex;
-    protected final UICompositor compositor = new UICompositor();
+    protected final ObsidianCompositor compositor = new ObsidianCompositor();
 
     public BiConsumer<ObsidianUI, ObsidianUI> getReadyListener() {
         return readyListener;
@@ -75,10 +81,10 @@ public class ObsidianAppState extends BaseAppState {
                 createSurface();
             }
 
-            var renderer = rm.getRenderer();
-            renderer.setFrameBuffer(uiFrameBuffer);
-            renderer.clearBuffers(true, true, true);
             ui.render();
+
+            rm.getRenderer().copyFrameBuffer(renderBuffer, uiFrameBuffer, true, false);
+
         }
     }
 
@@ -88,32 +94,29 @@ public class ObsidianAppState extends BaseAppState {
         int width = (int) dim.width();
         int height = (int) dim.height();
 
-        uiFrameBuffer = new FrameBuffer(width, height, DEFAULT_UI_SAMPLES);
-        uiTex = new Texture2D(width, height, DEFAULT_UI_SAMPLES, Image.Format.ARGB8);
+        uiFrameBuffer = new FrameBuffer(width, height, 1);
+        uiTex = new Texture2D(width, height, 1, Image.Format.RGBA8);
         uiFrameBuffer.addColorTarget(FrameBuffer.FrameBufferTarget.newTarget(uiTex));
-        uiFrameBuffer.setDepthTarget(FrameBuffer.FrameBufferTarget.newTarget(Image.Format.Depth24Stencil8));
+        compositor.setUITexture(uiTex);
+
+        renderBuffer = new FrameBuffer(width, height, DEFAULT_UI_SAMPLES);
+        renderBuffer.addColorTarget(FrameBuffer.FrameBufferTarget.newTarget(Image.Format.RGBA8));
+
 
         var renderer = getApplication().getRenderer();
         // Initialize the framebuffer - without this, the handle will
         // not be set when the framebuffer is passed to Obsidian
         renderer.setFrameBuffer(uiFrameBuffer);
-        renderer.clearBuffers(true, true, true);
-        renderer.setFrameBuffer(null);
-
-        // Do this after initializing the framebuffer so that the
-        // texture handle has been set
-        System.out.println("Texture handle: " + uiTex.getImage().getId());
-        compositor.setUITexture(uiTex);
+        renderer.setFrameBuffer(renderBuffer);
 
         if(ui == null){
             // This will run once when the UI is first initialized
             var oldUI = ui;
 
-            System.out.println("FB id: " + uiFrameBuffer.getId());
-            ui = ObsidianUI.createForGL(width, height, uiFrameBuffer.getId());
+            ui = ObsidianUI.createForGL(width, height, DEFAULT_UI_SAMPLES, renderBuffer.getId());
+            ui.clearColor().set(Colors.TRANSPARENT);
             try {
                 ui.registerSkin(ChipmunkSkinLoader.loadFromClasspath(ChipmunkSkinLoader.DEFAULT_SKIN));
-                // TODO - need to accept user-specified or skin will always be forced back to this when the UI is recreated by a resize
                 ui.useSkin("Obsidian");
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -126,7 +129,7 @@ public class ObsidianAppState extends BaseAppState {
             }
         }else{
             ui.display().ifSet(DisplayEngine::close);
-            ui.setDisplay(DisplayEngine.createForGL((int)dim.width(), (int)dim.height(), uiFrameBuffer.getId()));
+            ui.setDisplay(DisplayEngine.createForGL((int)dim.width(), (int)dim.height(), DEFAULT_UI_SAMPLES, uiFrameBuffer.getId()));
         }
     }
 

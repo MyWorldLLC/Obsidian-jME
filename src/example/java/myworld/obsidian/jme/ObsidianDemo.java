@@ -13,7 +13,7 @@ public class ObsidianDemo extends SimpleApplication {
         var obsidian = new ObsidianAppState();
         getStateManager().attach(obsidian);
         obsidian.setReadyListener((oldUi, ui) -> {
-            System.out.println("UI is ready");
+            // TODO - create demo UI here
         });
     }
 
@@ -24,6 +24,7 @@ public class ObsidianDemo extends SimpleApplication {
         settings.setVSync(true);
         settings.setResizable(true);
         settings.setResolution(1200, 800);
+        settings.setRenderer(AppSettings.LWJGL_OPENGL33);
 
         demo.setSettings(settings);
 
