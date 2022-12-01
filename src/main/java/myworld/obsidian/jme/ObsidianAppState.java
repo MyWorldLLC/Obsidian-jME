@@ -77,12 +77,16 @@ public class ObsidianAppState extends BaseAppState {
     @Override
     public void render(RenderManager rm){
         if(ui != null) {
+
             if (needsResize()) {
                 createSurface();
             }
 
             ui.render();
 
+            // This is required to resolve MSAA and sample from the texture for compositing. It should
+            // not be necessary in modern OpenGL versions, but for some reason it seems to be required
+            // regardless of jME renderer version.
             rm.getRenderer().copyFrameBuffer(renderBuffer, uiFrameBuffer, true, false);
 
         }
@@ -129,7 +133,7 @@ public class ObsidianAppState extends BaseAppState {
             }
         }else{
             ui.display().ifSet(DisplayEngine::close);
-            ui.setDisplay(DisplayEngine.createForGL((int)dim.width(), (int)dim.height(), DEFAULT_UI_SAMPLES, uiFrameBuffer.getId()));
+            ui.setDisplay(DisplayEngine.createForGL((int)dim.width(), (int)dim.height(), DEFAULT_UI_SAMPLES, renderBuffer.getId()));
         }
     }
 
