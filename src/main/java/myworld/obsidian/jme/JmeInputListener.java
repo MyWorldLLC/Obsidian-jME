@@ -29,10 +29,22 @@ import static com.jme3.input.KeyInput.*;
 
 public class JmeInputListener implements RawInputListener {
 
-    protected final ObsidianUI ui;
+    protected ObsidianUI ui;
     protected boolean consumeEvents;
 
+    public JmeInputListener(){
+        this(null);
+    }
+
     public JmeInputListener(ObsidianUI ui){
+        this.ui = ui;
+    }
+
+    public ObsidianUI getUi() {
+        return ui;
+    }
+
+    public void setUi(ObsidianUI ui) {
         this.ui = ui;
     }
 
@@ -58,6 +70,10 @@ public class JmeInputListener implements RawInputListener {
 
     @Override
     public void onMouseMotionEvent(MouseMotionEvent evt) {
+        if(ui == null){
+            return;
+        }
+
         BaseEvent uiEvt;
         if(evt.getDeltaWheel() != 0){
             uiEvt = ui.getInput().fireMouseWheelEvent(MouseWheelAxis.VERTICAL, evt.getX(), invert(evt.getY()), -evt.getDeltaWheel());
@@ -69,6 +85,10 @@ public class JmeInputListener implements RawInputListener {
 
     @Override
     public void onMouseButtonEvent(MouseButtonEvent evt) {
+        if(ui == null){
+            return;
+        }
+
         MouseButton button = switch (evt.getButtonIndex()){
             case MouseInput.BUTTON_LEFT -> MouseButton.PRIMARY;
             case MouseInput.BUTTON_MIDDLE -> MouseButton.MIDDLE;
@@ -81,6 +101,9 @@ public class JmeInputListener implements RawInputListener {
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
+        if(ui == null){
+            return;
+        }
 
         BaseEvent uiEvt;
         if(evt.getKeyChar() == 0){

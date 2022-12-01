@@ -31,6 +31,15 @@ def getPlatform(){
     return platform
 }
 
+def getSkijaPlatform(){
+    def platforms = [
+            'win': 'windows',
+            'mac': 'macos-x64',
+            'linux': 'linux'
+    ]
+    platforms[getPlatform()]
+}
+
 def jfxVersion = "16"
 javafx {
     version = jfxVersion
@@ -38,7 +47,7 @@ javafx {
     configuration = 'compileOnly'
 }
 
-def jmeVersion = '3.5.1-stable'
+def jmeVersion = '3.5.2-stable'
 group = 'com.myworldvw'
 version = getGitVersion()
 
@@ -61,16 +70,34 @@ dependencies {
     implementation "org.openjfx:javafx-web:$jfxVersion:$platform"
     implementation "org.openjfx:javafx-media:$jfxVersion:$platform"
 
+    implementation "io.github.humbleui:skija-${getSkijaPlatform()}:0.105.0"
+
     implementation "org.jmonkeyengine:jme3-core:$jmeVersion"
     implementation "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+    implementation "org.jmonkeyengine:jme3-effects:$jmeVersion"
     implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
 
-    api "com.myworldvw:obsidian:1.0.2"
+    api "com.myworldvw:obsidian:1.0.1-SNAPSHOT"
+}
+
+sourceSets {
+    main
+    example {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    exampleImplementation.extendsFrom(implementation)
 }
 
 java {
     withSourcesJar()
     withJavadocJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
 }
 
 publishing {
@@ -95,4 +122,12 @@ publishing {
             }
         }
     }
+}
+
+task run(type: JavaExec){
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+    classpath = sourceSets.example.compileClasspath + sourceSets.example.runtimeClasspath
+    mainClass = 'myworld.obsidian.jme.ObsidianDemo'
 }
