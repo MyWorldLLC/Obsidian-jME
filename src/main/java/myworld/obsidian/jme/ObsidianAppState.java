@@ -94,26 +94,6 @@ public class ObsidianAppState extends BaseAppState {
         }
 
         ctx.render();
-
-        /*if(ui != null) {
-
-            if (needsResize()) {
-                createSurface();
-            }
-
-            var renderer = rm.getRenderer();
-            renderer.setFrameBuffer(renderBuffer);
-            renderer.clearBuffers(true, true, true);
-            ui.render();
-            glFinish();
-
-            // This is required to resolve MSAA and sample from the texture for compositing. It should
-            // not be necessary in modern OpenGL versions, but for some reason it seems to be required
-            // regardless of jME renderer version.
-            renderer.setFrameBuffer(uiFrameBuffer);
-            renderer.copyFrameBuffer(renderBuffer, uiFrameBuffer, true, false);
-
-        }*/
     }
 
     protected void updateSampleTexture(){
@@ -133,52 +113,6 @@ public class ObsidianAppState extends BaseAppState {
         compositor.setUITexture(sampleTex);
     }
 
-/*    protected void createSurface(){
-        var dim = getExpectedDimensions();
-
-        int width = (int) dim.width();
-        int height = (int) dim.height();
-
-        uiFrameBuffer = new FrameBuffer(width, height, 1);
-        uiTex = new Texture2D(width, height, 1, Image.Format.RGBA8);
-        uiFrameBuffer.addColorTarget(FrameBuffer.FrameBufferTarget.newTarget(uiTex));
-
-        compositor.setUITexture(uiTex);
-
-        renderBuffer = new FrameBuffer(width, height, DEFAULT_UI_SAMPLES);
-        renderBuffer.addColorTarget(FrameBuffer.FrameBufferTarget.newTarget(Image.Format.RGBA8));
-
-        var renderer = getApplication().getRenderer();
-        // Initialize the framebuffers - without this, the handle will
-        // not be set when the rendering framebuffer is passed to Obsidian
-        renderer.setFrameBuffer(uiFrameBuffer);
-        renderer.setFrameBuffer(renderBuffer);
-
-        // This will run once when the UI is first initialized
-        if(ui == null){
-            var oldUI = ui;
-
-            //ui = ObsidianUI.createHeadless();
-            //ui = ObsidianUI.createForGL(width, height, DEFAULT_UI_SAMPLES, renderBuffer.getId());
-            ui.clearColor().set(Colors.TRANSPARENT);
-            try {
-                ui.registerSkin(ChipmunkSkinLoader.loadFromClasspath(ChipmunkSkinLoader.DEFAULT_SKIN));
-                ui.useSkin("Obsidian");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            listener.setUi(ui);
-
-            if(readyListener != null){
-                readyListener.accept(oldUI, ui);
-            }
-        }else{
-            ui.display().ifSet(DisplayEngine::close);
-            ui.setDisplay(DisplayEngine.createForGL((int)dim.width(), (int)dim.height(), DEFAULT_UI_SAMPLES, renderBuffer.getId()));
-        }
-    }*/
-
     protected Dimension2D getExpectedDimensions(){
         var cam = getApplication().getGuiViewPort().getCamera();
         return new Dimension2D(cam.getWidth(), cam.getHeight());
@@ -197,6 +131,7 @@ public class ObsidianAppState extends BaseAppState {
     @Override
     protected void cleanup(Application application) {
         ui.cleanup();
+        ctx.cleanRenderSurface();
     }
 
     @Override

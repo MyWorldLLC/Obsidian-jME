@@ -88,7 +88,7 @@ dependencies {
 
     implementation "org.lwjgl:lwjgl-yoga:3.3.1:natives-${getLwjglPlatform()}"
 
-    api "com.myworldvw:obsidian:1.0.4"
+    api "com.myworldvw:obsidian:1.0.5"
 }
 
 sourceSets {

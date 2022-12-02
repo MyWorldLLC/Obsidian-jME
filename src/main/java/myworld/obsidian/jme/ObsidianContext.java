@@ -4,6 +4,7 @@ import com.jme3.app.Application;
 import com.jme3.system.lwjgl.LwjglWindow;
 import myworld.obsidian.ObsidianUI;
 import myworld.obsidian.display.DisplayEngine;
+import myworld.obsidian.display.GLSurfaceManager;
 import myworld.obsidian.geometry.Dimension2D;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -122,8 +123,18 @@ public class ObsidianContext {
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-            ui.display().ifSet(DisplayEngine::close);
-            ui.display().set(DisplayEngine.createForGL(getWidth(), getHeight(), msaa.getSamples(), renderFBO));
+            if(ui.getDisplay() != null){
+                var surfaceManager = (GLSurfaceManager) ui.getDisplay().getSurfaceManager();
+
+                surfaceManager.setSamples(msaa.getSamples());
+                surfaceManager.setFramebufferHandle(renderFBO);
+
+                ui.getDisplay().resize(getWidth(), getHeight());
+
+            }else{
+                ui.setDisplay(DisplayEngine.createForGL(getWidth(), getHeight(), msaa.getSamples(), renderFBO));
+            }
+
         });
     }
 
@@ -148,9 +159,6 @@ public class ObsidianContext {
                 glDeleteFramebuffers(sampleFBO);
                 sampleFBO = 0;
             }
-
-            ui.display().ifSet(DisplayEngine::close);
-            ui.display().set(null);
         });
 
     }
