@@ -171,7 +171,7 @@ public class ObsidianContext {
     }
 
     protected LwjglWindow getWindow(){
-        return (LwjglWindow) app.getContext();
+        return Lwjgl3WindowFetcher.getWindow(app);
     }
 
     protected int getWidth(){
