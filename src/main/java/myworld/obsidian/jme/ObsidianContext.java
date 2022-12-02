@@ -47,7 +47,7 @@ public class ObsidianContext {
         // This is crucial - without this, antialiasing will be disabled on the framebuffer
         // and any Skia operations involving clipping will result in major flickering and image
         // corruption across the entire drawing canvas.
-        //glfwWindowHint(GLFW_SAMPLES, msaa.getSamples());
+        glfwWindowHint(GLFW_SAMPLES, msaa.getSamples());
 
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         // Share OpenGL resources with the application window
@@ -111,7 +111,7 @@ public class ObsidianContext {
             // Create sample buffer target
             sampleTex = glGenTextures();
             glBindTexture(GL_TEXTURE_2D, sampleTex);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, getWidth(), getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, getWidth(), getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
             sampleFBO = glGenFramebuffers();
