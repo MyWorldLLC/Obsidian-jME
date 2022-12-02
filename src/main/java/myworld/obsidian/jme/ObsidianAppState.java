@@ -131,7 +131,7 @@ public class ObsidianAppState extends BaseAppState {
     @Override
     protected void cleanup(Application application) {
         ui.cleanup();
-        ctx.cleanRenderSurface();
+        ctx.close();
     }
 
     @Override
