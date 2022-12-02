@@ -40,11 +40,11 @@ public class JmeInputListener implements RawInputListener {
         this.ui = ui;
     }
 
-    public ObsidianUI getUi() {
+    public ObsidianUI getUI() {
         return ui;
     }
 
-    public void setUi(ObsidianUI ui) {
+    public void setUI(ObsidianUI ui) {
         this.ui = ui;
     }
 

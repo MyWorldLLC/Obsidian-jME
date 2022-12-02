@@ -20,61 +20,82 @@ import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
-import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
+import com.jme3.texture.image.ColorSpace;
 import myworld.obsidian.ObsidianUI;
 import myworld.obsidian.display.Colors;
-import myworld.obsidian.display.DisplayEngine;
 import myworld.obsidian.display.skin.chipmunk.ChipmunkSkinLoader;
 import myworld.obsidian.geometry.Dimension2D;
 
-import java.util.function.BiConsumer;
-
-import static org.lwjgl.opengl.GL11.*;
+import java.util.function.Consumer;
 
 public class ObsidianAppState extends BaseAppState {
 
     public static final int DEFAULT_UI_SAMPLES = 4;
 
-    protected ObsidianUI ui;
+    protected final ObsidianUI ui;
+    protected ObsidianContext ctx;
     protected JmeInputListener listener;
-    protected BiConsumer<ObsidianUI, ObsidianUI> readyListener;
+    protected Consumer<ObsidianUI> readyListener;
 
     protected FilterPostProcessor filters;
 
-    protected FrameBuffer renderBuffer;
-    protected FrameBuffer uiFrameBuffer;
-    protected Texture2D uiTex;
-    protected final ObsidianCompositor compositor = new ObsidianCompositor();
+    protected final Texture2D sampleTex;
+    protected final ObsidianCompositor compositor;
 
-    public BiConsumer<ObsidianUI, ObsidianUI> getReadyListener() {
-        return readyListener;
+    public ObsidianAppState(){
+        ui = ObsidianUI.createHeadless();
+        compositor = new ObsidianCompositor();
+        sampleTex = new Texture2D();
     }
 
-    public void setReadyListener(BiConsumer<ObsidianUI, ObsidianUI> readyListener) {
+    public void setReadyListener(Consumer<ObsidianUI> readyListener) {
         this.readyListener = readyListener;
     }
 
     @Override
     protected void initialize(Application application) {
         listener = new JmeInputListener();
+        listener.setUI(ui);
 
         filters = new FilterPostProcessor(application.getAssetManager());
         filters.addFilter(compositor);
-        createSurface();
+
+        ctx = new ObsidianContext(application, ui);
+        ctx.init(getExpectedDimensions(), AntiAliasing.STANDARD); // TODO - configurable AA
+        updateSampleTexture();
+
+        ui.clearColor().set(Colors.TRANSPARENT);
+        try {
+            ui.registerSkin(ChipmunkSkinLoader.loadFromClasspath(ChipmunkSkinLoader.DEFAULT_SKIN));
+            ui.useSkin("Obsidian");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if(readyListener != null){
+            readyListener.accept(ui);
+        }
+
     }
 
     @Override
     public void update(float tpf){
-        if(ui != null){
-            ui.update(tpf);
-        }
+        ui.update(tpf);
     }
 
     @Override
     public void render(RenderManager rm){
-        if(ui != null) {
+
+        if(needsResize()){
+            ctx.resize(getExpectedDimensions());
+            updateSampleTexture();
+        }
+
+        ctx.render();
+
+        /*if(ui != null) {
 
             if (needsResize()) {
                 createSurface();
@@ -92,10 +113,27 @@ public class ObsidianAppState extends BaseAppState {
             renderer.setFrameBuffer(uiFrameBuffer);
             renderer.copyFrameBuffer(renderBuffer, uiFrameBuffer, true, false);
 
-        }
+        }*/
     }
 
-    protected void createSurface(){
+    protected void updateSampleTexture(){
+        var size = getExpectedDimensions();
+        var image = new Image();
+        image.setId(ctx.getTextureHandle());
+        image.setFormat(Image.Format.RGBA8);
+        image.setWidth((int)size.width());
+        image.setHeight((int)size.height());
+        image.setColorSpace(ColorSpace.sRGB);
+
+        // Need to set this as soon as we create it so jME doesn't
+        // try to overwrite the OpenGL state
+        image.clearUpdateNeeded();
+
+        sampleTex.setImage(image);
+        compositor.setUITexture(sampleTex);
+    }
+
+/*    protected void createSurface(){
         var dim = getExpectedDimensions();
 
         int width = (int) dim.width();
@@ -120,7 +158,7 @@ public class ObsidianAppState extends BaseAppState {
         if(ui == null){
             var oldUI = ui;
 
-            ui = ObsidianUI.createHeadless();
+            //ui = ObsidianUI.createHeadless();
             //ui = ObsidianUI.createForGL(width, height, DEFAULT_UI_SAMPLES, renderBuffer.getId());
             ui.clearColor().set(Colors.TRANSPARENT);
             try {
@@ -139,7 +177,7 @@ public class ObsidianAppState extends BaseAppState {
             ui.display().ifSet(DisplayEngine::close);
             ui.setDisplay(DisplayEngine.createForGL((int)dim.width(), (int)dim.height(), DEFAULT_UI_SAMPLES, renderBuffer.getId()));
         }
-    }
+    }*/
 
     protected Dimension2D getExpectedDimensions(){
         var cam = getApplication().getGuiViewPort().getCamera();
@@ -158,11 +196,7 @@ public class ObsidianAppState extends BaseAppState {
 
     @Override
     protected void cleanup(Application application) {
-        if(ui != null){
-            ui.cleanup();
-            uiFrameBuffer = null;
-            uiTex = null;
-        }
+        ui.cleanup();
     }
 
     @Override

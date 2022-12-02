@@ -24,9 +24,13 @@ public class ObsidianDemo extends SimpleApplication {
 
         var obsidian = new ObsidianAppState();
         getStateManager().attach(obsidian);
-        obsidian.setReadyListener((oldUi, ui) -> {
+        obsidian.setReadyListener((ui) -> {
             var layout = new ExampleLayout();
             ui.getRoot().addChild(layout);
+
+            ui.getRoot().dispatcher().subscribe(MouseOverEvent.class, evt -> evt.isHovering(ui.getRoot()), evt -> {
+                System.out.println("(%d, %d)".formatted(evt.getX(), evt.getY()));
+            });
 
             var example = new Component();
             example.styleName().set("Example");

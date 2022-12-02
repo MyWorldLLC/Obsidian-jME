@@ -65,7 +65,7 @@ public class ObsidianContext {
         return sampleTex;
     }
 
-    public void render(ObsidianUI ui){
+    public void render(){
         inContext(() -> {
 
             glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
