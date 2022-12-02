@@ -24,7 +24,6 @@ import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import myworld.obsidian.ObsidianUI;
-import myworld.obsidian.display.ColorRGBA;
 import myworld.obsidian.display.Colors;
 import myworld.obsidian.display.DisplayEngine;
 import myworld.obsidian.display.skin.chipmunk.ChipmunkSkinLoader;
@@ -32,8 +31,7 @@ import myworld.obsidian.geometry.Dimension2D;
 
 import java.util.function.BiConsumer;
 
-import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
-import static org.lwjgl.opengl.GL11.glGetError;
+import static org.lwjgl.opengl.GL11.*;
 
 public class ObsidianAppState extends BaseAppState {
 
@@ -82,12 +80,17 @@ public class ObsidianAppState extends BaseAppState {
                 createSurface();
             }
 
+            var renderer = rm.getRenderer();
+            renderer.setFrameBuffer(renderBuffer);
+            renderer.clearBuffers(true, true, true);
             ui.render();
+            glFinish();
 
             // This is required to resolve MSAA and sample from the texture for compositing. It should
             // not be necessary in modern OpenGL versions, but for some reason it seems to be required
             // regardless of jME renderer version.
-            rm.getRenderer().copyFrameBuffer(renderBuffer, uiFrameBuffer, true, false);
+            renderer.setFrameBuffer(uiFrameBuffer);
+            renderer.copyFrameBuffer(renderBuffer, uiFrameBuffer, true, false);
 
         }
     }
@@ -101,23 +104,24 @@ public class ObsidianAppState extends BaseAppState {
         uiFrameBuffer = new FrameBuffer(width, height, 1);
         uiTex = new Texture2D(width, height, 1, Image.Format.RGBA8);
         uiFrameBuffer.addColorTarget(FrameBuffer.FrameBufferTarget.newTarget(uiTex));
+
         compositor.setUITexture(uiTex);
 
         renderBuffer = new FrameBuffer(width, height, DEFAULT_UI_SAMPLES);
         renderBuffer.addColorTarget(FrameBuffer.FrameBufferTarget.newTarget(Image.Format.RGBA8));
 
-
         var renderer = getApplication().getRenderer();
-        // Initialize the framebuffer - without this, the handle will
-        // not be set when the framebuffer is passed to Obsidian
+        // Initialize the framebuffers - without this, the handle will
+        // not be set when the rendering framebuffer is passed to Obsidian
         renderer.setFrameBuffer(uiFrameBuffer);
         renderer.setFrameBuffer(renderBuffer);
 
+        // This will run once when the UI is first initialized
         if(ui == null){
-            // This will run once when the UI is first initialized
             var oldUI = ui;
 
-            ui = ObsidianUI.createForGL(width, height, DEFAULT_UI_SAMPLES, renderBuffer.getId());
+            ui = ObsidianUI.createHeadless();
+            //ui = ObsidianUI.createForGL(width, height, DEFAULT_UI_SAMPLES, renderBuffer.getId());
             ui.clearColor().set(Colors.TRANSPARENT);
             try {
                 ui.registerSkin(ChipmunkSkinLoader.loadFromClasspath(ChipmunkSkinLoader.DEFAULT_SKIN));

@@ -10,13 +10,9 @@ vec4 composite(vec4 a, vec4 b){
     return a + b * (1.0 - a.a);
 }
 
-vec2 invert(vec2 texCoord){
-    return vec2(texCoord.x, 1.0 - texCoord.y);
-}
-
 void main() {
 
-    vec4 uiSample = getColor(m_UITexture, invert(texCoord));
+    vec4 uiSample = getColor(m_UITexture, texCoord);
     vec4 filterSample = getColor(m_Texture, texCoord);
 
     gl_FragColor = composite(uiSample, filterSample);
