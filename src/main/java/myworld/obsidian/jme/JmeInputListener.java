@@ -106,7 +106,7 @@ public class JmeInputListener implements RawInputListener {
         }
 
         BaseEvent uiEvt;
-        if(evt.getKeyChar() == 0){
+        if(evt.getKeyChar() != 0 && evt.isPressed()){
             uiEvt = ui.getInput().fireCharacterEvent(new char[]{evt.getKeyChar()});
             consumeEvent(evt, uiEvt);
         }
