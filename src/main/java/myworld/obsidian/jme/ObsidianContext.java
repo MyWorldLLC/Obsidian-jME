@@ -11,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL32C.*;
 
 /**
- * Manages a dedicated OpenGL context & rendering target for Obsidian
+ * Manages a dedicated OpenGL context ;&amp; rendering target for Obsidian
  */
 public class ObsidianContext {
 
@@ -166,7 +166,7 @@ public class ObsidianContext {
     protected void verifyFBO(String bufferName){
         int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(status != GL_FRAMEBUFFER_COMPLETE){
-            throw new IllegalStateException("Could not allocate %s framebuffer: %d".formatted(bufferName, status));
+            throw new IllegalStateException("Could not allocate %s framebuffer: 0x%x".formatted(bufferName, status));
         }
     }
 

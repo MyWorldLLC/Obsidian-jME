@@ -32,9 +32,10 @@ import java.util.function.Consumer;
 
 public class ObsidianAppState extends BaseAppState {
 
-    public static final int DEFAULT_UI_SAMPLES = 4;
+    public static final AntiAliasing DEFAULT_UI_ANTIALIASING = AntiAliasing.FULL;
 
     protected final ObsidianUI ui;
+    protected final AntiAliasing msaa;
     protected ObsidianContext ctx;
     protected JmeInputListener listener;
     protected Consumer<ObsidianUI> readyListener;
@@ -45,9 +46,14 @@ public class ObsidianAppState extends BaseAppState {
     protected final ObsidianCompositor compositor;
 
     public ObsidianAppState(){
+        this(DEFAULT_UI_ANTIALIASING);
+    }
+
+    public ObsidianAppState(AntiAliasing msaa){
         ui = ObsidianUI.createHeadless();
         compositor = new ObsidianCompositor();
         sampleTex = new Texture2D();
+        this.msaa = msaa;
     }
 
     public void setReadyListener(Consumer<ObsidianUI> readyListener) {
@@ -63,7 +69,7 @@ public class ObsidianAppState extends BaseAppState {
         filters.addFilter(compositor);
 
         ctx = new ObsidianContext(application, ui);
-        ctx.init(getExpectedDimensions(), AntiAliasing.STANDARD); // TODO - configurable AA
+        ctx.init(getExpectedDimensions(), msaa);
         updateSampleTexture();
 
         ui.clearColor().set(Colors.TRANSPARENT);
