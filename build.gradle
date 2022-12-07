@@ -1,12 +1,10 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
 def getGitVersion(){
-    def version = "git describe --tags --always --first-parent".execute().text.trim()
-    version.contains('-') ? version[0..<version.indexOf('-')] + '-SNAPSHOT' : version
+    "git describe --tags --always --first-parent".execute().text.trim()
 }
 
 def getGitCredentials(){
@@ -17,7 +15,14 @@ def getGitCredentials(){
 
     process.text.trim().split("\n").collectEntries {it.split("=")}
 }
-def gitCredentials = getGitCredentials()
+
+def getGitUser(){
+    System.getenv("GITHUB_USER") ?: gitCredentials["username"]
+}
+
+def getGitPassword(){
+    System.getenv("GITHUB_TOKEN") ?: gitCredentials["password"]
+}
 
 def getPlatform(){
     def platform = System.getProperty('os.name').toLowerCase()
@@ -31,64 +36,27 @@ def getPlatform(){
     return platform
 }
 
-def getSkijaPlatform(){
-    def platforms = [
-            'win': 'windows',
-            'mac': 'macos-x64',
-            'linux': 'linux'
-    ]
-    platforms[getPlatform()]
+def getArchitecture(){
+    System.getProperty('os.arch').toLowerCase().startsWith('aarch64') ? 'amd64' : 'x64'
 }
 
-def getLwjglPlatform(){
-    def platforms = [
-            'win': 'windows',
-            'mac': 'macos',
-            'linux': 'linux'
-    ]
-    platforms[getPlatform()]
-}
-
-def jfxVersion = "16"
-javafx {
-    version = jfxVersion
-    modules = ['javafx.graphics']
-    configuration = 'compileOnly'
-}
-
+def obsidianVersion = '1.0.8'
 def jmeVersion = '3.5.2-stable'
+def jdkVersion = 17
 group = 'com.myworldvw'
 version = getGitVersion()
 
+
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
     maven {
         url 'https://maven.pkg.github.com/MyWorldLLC/Packages'
         credentials {
-            username System.getenv("GITHUB_USER") ?: gitCredentials["username"]
-            password System.getenv("GITHUB_TOKEN") ?: gitCredentials["password"]
+            username gitUser
+            password gitPassword
         }
     }
-}
-
-dependencies {
-    implementation "org.openjfx:javafx-base:$jfxVersion:$platform"
-    implementation "org.openjfx:javafx-graphics:$jfxVersion:$platform"
-    implementation "org.openjfx:javafx-controls:$jfxVersion:$platform"
-    implementation "org.openjfx:javafx-web:$jfxVersion:$platform"
-    implementation "org.openjfx:javafx-media:$jfxVersion:$platform"
-
-    implementation "io.github.humbleui:skija-${getSkijaPlatform()}:0.105.0"
-
-    implementation "org.jmonkeyengine:jme3-core:$jmeVersion"
-    implementation "org.jmonkeyengine:jme3-desktop:$jmeVersion"
-    implementation "org.jmonkeyengine:jme3-effects:$jmeVersion"
-    implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
-
-    implementation "org.lwjgl:lwjgl-yoga:3.3.1:natives-${getLwjglPlatform()}"
-
-    api "com.myworldvw:obsidian:1.0.5"
 }
 
 sourceSets {
@@ -96,6 +64,9 @@ sourceSets {
     example {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
+        java {
+            srcDir 'example/java'
+        }
     }
 }
 
@@ -103,21 +74,38 @@ configurations {
     exampleImplementation.extendsFrom(implementation)
 }
 
+dependencies {
+
+    api "com.myworldvw:obsidian:$obsidianVersion"
+    api "com.myworldvw:obsidian-jfx:$obsidianVersion"
+    // We need this to compile against any JFX symbols, but this should
+    // *not* appear in the POM dependencies. The end user must include a
+    // ObsidianJFX platform module to compile their own code.
+    compileOnly "com.myworldvw:obsidian-jfx-$platform-$architecture:$obsidianVersion"
+
+    implementation "org.jmonkeyengine:jme3-core:$jmeVersion"
+    implementation "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+    implementation "org.jmonkeyengine:jme3-effects:$jmeVersion"
+    implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
+
+    exampleRuntimeOnly "com.myworldvw:obsidian-$platform-$architecture:$obsidianVersion"
+    exampleRuntimeOnly "com.myworldvw:obsidian-jfx-$platform-$architecture:$obsidianVersion"
+}
+
 java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        languageVersion = JavaLanguageVersion.of(16)
+        languageVersion = JavaLanguageVersion.of(jdkVersion)
     }
 }
 
 publishing {
     publications {
         maven(MavenPublication){
-
-            groupId = project.group
-            artifactId = 'obsidian-jme'
-            version = project.version
+            groupId project.group
+            artifactId 'obsidian-jme'
+            version project.version
 
             from components.java
         }
@@ -128,8 +116,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/MyWorldLLC/Packages")
             credentials {
-                username = System.getenv("GITHUB_USER") ?: gitCredentials["username"]
-                password = System.getenv("GITHUB_TOKEN") ?: gitCredentials["password"]
+                username gitUser
+                password gitPassword
             }
         }
     }
@@ -137,7 +125,7 @@ publishing {
 
 task run(type: JavaExec){
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(16)
+        languageVersion = JavaLanguageVersion.of(jdkVersion)
     }
     classpath = sourceSets.example.compileClasspath + sourceSets.example.runtimeClasspath
     mainClass = 'myworld.obsidian.jme.ObsidianDemo'
