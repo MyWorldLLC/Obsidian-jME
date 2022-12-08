@@ -13,7 +13,7 @@ MaterialDef UICompositor {
 
     Technique {
         VertexShader GLSL150 GLSL100: Common/MatDefs/Post/Post.vert
-        FragmentShader GLSL150 GLSL100: myworld/obsidian/jme/JfxCompositor.frag
+        FragmentShader GLSL150 GLSL100: myworld/obsidian/jfx/jme/JfxCompositor.frag
 
         WorldParameters {
         }

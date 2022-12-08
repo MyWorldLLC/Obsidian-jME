@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package myworld.obsidian.jme;
+package myworld.obsidian.jfx.jme;
 
 import com.jme3.input.MouseInput;
 import com.jme3.input.RawInputListener;

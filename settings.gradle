@@ -1,2 +1,3 @@
+include ':Obsidian-jME', ':ObsidianJFX-jME'
 rootProject.name = 'obsidian-jme'
 

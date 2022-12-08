@@ -1,0 +1,85 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://maven.pkg.github.com/MyWorldLLC/Packages'
+        credentials {
+            username gitUser
+            password gitPassword
+        }
+    }
+}
+
+sourceSets {
+    main
+    example {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+        java {
+            srcDir 'example/java'
+        }
+    }
+}
+
+configurations {
+    exampleImplementation.extendsFrom(implementation)
+}
+
+dependencies {
+
+    api "com.myworldvw:obsidian:$obsidianVersion"
+    api "com.myworldvw:obsidian-jfx:$obsidianVersion"
+
+    implementation "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+    implementation "org.jmonkeyengine:jme3-effects:$jmeVersion"
+    implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
+
+    exampleRuntimeOnly "com.myworldvw:obsidian-$platform-$architecture:$obsidianVersion"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(jdkVersion)
+    }
+    withJavadocJar()
+    withSourcesJar()
+}
+
+group = 'com.myworldvw'
+version = gitVersion
+
+publishing {
+    publications {
+        maven(MavenPublication){
+            groupId project.group
+            artifactId 'obsidian-jme'
+            version project.version
+
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MyWorldLLC/Packages")
+            credentials {
+                username gitUser
+                password gitPassword
+            }
+        }
+    }
+}
+
+task run(type: JavaExec){
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(jdkVersion)
+    }
+    classpath = sourceSets.example.compileClasspath + sourceSets.example.runtimeClasspath
+    mainClass = 'myworld.obsidian.jme.ObsidianDemo'
+}

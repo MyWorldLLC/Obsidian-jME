@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package myworld.obsidian.jme;
+package myworld.obsidian.jfx.jme;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -35,7 +35,7 @@ public class JfxCompositor extends Filter {
 
     @Override
     protected void initFilter(AssetManager manager, RenderManager renderManager, ViewPort vp, int w, int h) {
-        material = new Material(manager, "myworld/obsidian/jme/JfxCompositor.j3md");
+        material = new Material(manager, "myworld/obsidian/jfx/jme/JfxCompositor.j3md");
         material.setInt("PixelFormatARGB", PIXEL_FORMAT_ARGB);
         material.setInt("PixelFormatBGRA_PRE", PIXEL_FORMAT_BGRA_PRE);
         if(format != null){
