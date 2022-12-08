@@ -55,10 +55,11 @@ version = gitVersion
 
 publishing {
     publications {
-        maven(MavenPublication){
-            groupId project.group
-            artifactId 'obsidian-jme'
-            version project.version
+        maven(MavenPublication) {
+
+            groupId = group
+            artifactId = 'obsidian-jme'
+            version = version
 
             from components.java
         }
