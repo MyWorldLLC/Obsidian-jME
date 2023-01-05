@@ -25,7 +25,7 @@ import com.jme3.texture.Texture2D;
 import com.jme3.texture.image.ColorSpace;
 import myworld.obsidian.ObsidianUI;
 import myworld.obsidian.display.Colors;
-import myworld.obsidian.display.skin.chipmunk.ChipmunkSkinLoader;
+import myworld.obsidian.display.skin.obsidian.ObsidianSkin;
 import myworld.obsidian.geometry.Dimension2D;
 
 import java.util.function.Consumer;
@@ -74,7 +74,7 @@ public class ObsidianAppState extends BaseAppState {
 
         ui.clearColor().set(Colors.TRANSPARENT);
         try {
-            ui.registerSkin(ChipmunkSkinLoader.loadFromClasspath(ChipmunkSkinLoader.DEFAULT_SKIN));
+            ui.registerSkin(ObsidianSkin.create());
             ui.useSkin("Obsidian");
         } catch (Exception e) {
             throw new RuntimeException(e);

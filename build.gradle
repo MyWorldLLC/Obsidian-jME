@@ -37,7 +37,7 @@ def getArchitecture(){
 
 allprojects {
     ext {
-        obsidianVersion = '1.0.10'
+        obsidianVersion = '1.0.9-13-g042d1a2'
         jmeVersion = '3.5.2-stable'
         jdkVersion = 17
         platform = this.platform
