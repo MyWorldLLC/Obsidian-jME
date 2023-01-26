@@ -7,6 +7,7 @@ import myworld.obsidian.components.Button;
 import myworld.obsidian.components.Checkbox;
 import myworld.obsidian.components.text.TextDisplay;
 import myworld.obsidian.components.text.TextField;
+import myworld.obsidian.display.skin.obsidian.ObsidianSkin;
 import myworld.obsidian.events.input.CharacterEvent;
 import myworld.obsidian.events.input.KeyEvent;
 import myworld.obsidian.events.input.MouseOverEvent;
@@ -25,6 +26,7 @@ public class ObsidianDemo extends SimpleApplication {
         var obsidian = new ObsidianAppState();
         getStateManager().attach(obsidian);
         obsidian.setReadyListener((ui) -> {
+
             var layout = new ExampleLayout();
             ui.getRoot().addChild(layout);
 

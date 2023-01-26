@@ -73,17 +73,18 @@ public class ObsidianAppState extends BaseAppState {
         updateSampleTexture();
 
         ui.clearColor().set(Colors.TRANSPARENT);
-        try {
-            ui.registerSkin(ObsidianSkin.create());
-            ui.useSkin("Obsidian");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+        ui.registerSkin(ObsidianSkin.create());
+        ui.useSkin("Obsidian");
 
         if(readyListener != null){
             readyListener.accept(ui);
         }
 
+    }
+
+    public ObsidianUI getUI(){
+        return ui;
     }
 
     @Override
