@@ -20,6 +20,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.image.ColorSpace;
@@ -39,7 +40,6 @@ public class ObsidianAppState extends BaseAppState {
     protected ObsidianContext ctx;
     protected JmeInputListener listener;
     protected Consumer<ObsidianUI> readyListener;
-
     protected FilterPostProcessor filters;
 
     protected final Texture2D sampleTex;
@@ -144,12 +144,12 @@ public class ObsidianAppState extends BaseAppState {
     @Override
     protected void onEnable() {
         getApplication().getInputManager().addRawInputListener(listener);
-        getApplication().getGuiViewPort().addProcessor(filters);
+        getApplication().getViewPort().addProcessor(filters);
     }
 
     @Override
     protected void onDisable() {
         getApplication().getInputManager().removeRawInputListener(listener);
-        getApplication().getGuiViewPort().removeProcessor(filters);
+        getApplication().getViewPort().removeProcessor(filters);
     }
 }

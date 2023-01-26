@@ -2,6 +2,11 @@ package myworld.obsidian.jme;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
 import myworld.obsidian.components.Button;
 import myworld.obsidian.components.Checkbox;
@@ -22,6 +27,17 @@ public class ObsidianDemo extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         getFlyByCamera().setEnabled(false);
+
+        var cube = new Box(1f, 1f, 1f);
+        var geom = new Geometry("Box");
+        geom.setMesh(cube);
+
+        var material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        material.setColor("Color", ColorRGBA.Blue);
+        geom.setMaterial(material);
+        rootNode.attachChild(geom);
+        cam.setLocation(new Vector3f(0, 0, -10f));
+        cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 
         var obsidian = new ObsidianAppState();
         getStateManager().attach(obsidian);
