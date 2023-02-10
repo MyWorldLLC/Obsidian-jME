@@ -54,6 +54,9 @@ public class ObsidianAppState extends BaseAppState {
         compositor = new ObsidianCompositor();
         sampleTex = new Texture2D();
         this.msaa = msaa;
+
+        listener = new JmeInputListener();
+        listener.setUI(ui);
     }
 
     public void setReadyListener(Consumer<ObsidianUI> readyListener) {
@@ -62,9 +65,6 @@ public class ObsidianAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application application) {
-        listener = new JmeInputListener();
-        listener.setUI(ui);
-
         filters = new FilterPostProcessor(application.getAssetManager());
         filters.addFilter(compositor);
 
@@ -81,6 +81,10 @@ public class ObsidianAppState extends BaseAppState {
             readyListener.accept(ui);
         }
 
+    }
+
+    public JmeInputListener getInputListener(){
+        return listener;
     }
 
     public ObsidianUI getUI(){

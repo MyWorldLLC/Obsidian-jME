@@ -2,6 +2,8 @@ package myworld.obsidian.jme;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.input.RawInputListener;
+import com.jme3.input.event.*;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -41,6 +43,8 @@ public class ObsidianDemo extends SimpleApplication {
 
         var obsidian = new ObsidianAppState();
         getStateManager().attach(obsidian);
+        obsidian.getInputListener().setConsumeEvents(true);
+
         obsidian.setReadyListener((ui) -> {
 
             var layout = new ExampleLayout();
@@ -48,33 +52,6 @@ public class ObsidianDemo extends SimpleApplication {
 
             ui.getRoot().dispatcher().subscribe(MouseOverEvent.class, evt -> evt.isHovering(ui.getRoot()), evt -> {
                 System.out.println("(%d, %d)".formatted(evt.getX(), evt.getY()));
-            });
-
-            var example = new Component();
-            example.styleName().set("Example");
-            example.layout().preferredSize(Distance.pixels(100), Distance.pixels(50));
-            layout.left().addChild(example);
-
-            example.renderVars().put("text", () -> new Text("Hello, World!", ui.getStyle("ExampleText")));
-
-            example.dispatcher().subscribe(MouseOverEvent.class, evt -> evt.entered(example), evt -> {
-                System.out.println("Mouse entered");
-            });
-
-            example.dispatcher().subscribe(MouseOverEvent.class, evt -> evt.exited(example), evt -> {
-                System.out.println("Mouse exited");
-            });
-
-            example.dispatcher().subscribe(MouseOverEvent.class, evt -> evt.isHovering(example), evt -> {
-                System.out.println("(%d, %d)".formatted(evt.getX(), evt.getY()));
-            });
-
-            example.dispatcher().subscribe(CharacterEvent.class, evt -> {
-                System.out.println("Received characters: " + String.copyValueOf(evt.getCharacters()));
-            });
-
-            example.dispatcher().subscribe(KeyEvent.class, KeyEvent::isDown, evt -> {
-                System.out.println("Key: " + evt.getKey());
             });
 
             var textField = TextField.password('*');
@@ -99,6 +76,40 @@ public class ObsidianDemo extends SimpleApplication {
             layout.right().addChild(checkbox);
 
             ui.requestFocus(textField);
+
+            enqueue(() -> {
+                inputManager.addRawInputListener(new RawInputListener() {
+                    @Override
+                    public void beginInput() {}
+
+                    @Override
+                    public void endInput() {}
+
+                    @Override
+                    public void onJoyAxisEvent(JoyAxisEvent evt) {}
+
+                    @Override
+                    public void onJoyButtonEvent(JoyButtonEvent evt) {}
+
+                    @Override
+                    public void onMouseMotionEvent(MouseMotionEvent evt) {
+                        System.out.println(evt);
+                    }
+
+                    @Override
+                    public void onMouseButtonEvent(MouseButtonEvent evt) {
+                        System.out.println(evt);
+                    }
+
+                    @Override
+                    public void onKeyEvent(KeyInputEvent evt) {
+                        System.out.println(evt);
+                    }
+
+                    @Override
+                    public void onTouchEvent(TouchEvent evt) {}
+                });
+            });
         });
     }
 
