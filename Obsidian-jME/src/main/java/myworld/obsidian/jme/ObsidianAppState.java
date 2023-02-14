@@ -45,14 +45,15 @@ public class ObsidianAppState extends BaseAppState {
     protected final Texture2D sampleTex;
     protected final ObsidianCompositor compositor;
 
-    public ObsidianAppState(){
-        this(DEFAULT_UI_ANTIALIASING);
+    public ObsidianAppState(FilterPostProcessor filters){
+        this(filters, DEFAULT_UI_ANTIALIASING);
     }
 
-    public ObsidianAppState(AntiAliasing msaa){
+    public ObsidianAppState(FilterPostProcessor filters, AntiAliasing msaa){
         ui = ObsidianUI.createHeadless();
         compositor = new ObsidianCompositor();
         sampleTex = new Texture2D();
+        this.filters = filters;
         this.msaa = msaa;
 
         listener = new JmeInputListener();
@@ -65,8 +66,6 @@ public class ObsidianAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application application) {
-        filters = new FilterPostProcessor(application.getAssetManager());
-        filters.addFilter(compositor);
 
         ctx = new ObsidianContext(application, ui);
         ctx.init(getExpectedDimensions(), msaa);
@@ -124,19 +123,35 @@ public class ObsidianAppState extends BaseAppState {
         compositor.setUITexture(sampleTex);
     }
 
-    protected Dimension2D getExpectedDimensions(){
-        var cam = getApplication().getGuiViewPort().getCamera();
+    public Dimension2D getExpectedDimensions(){
+        var cam = getApplication().getViewPort().getCamera();
         return new Dimension2D(cam.getWidth(), cam.getHeight());
     }
 
-    protected Dimension2D getActualDimensions(){
+    public Dimension2D getActualDimensions(){
         return ui != null ? ui.getDisplay().getDimensions().get() : null;
     }
 
-    protected boolean needsResize(){
+    public boolean needsResize(){
         var actual = getActualDimensions();
         var expected = getExpectedDimensions();
         return actual.width() != expected.width() || actual.height() != expected.height();
+    }
+
+    public FilterPostProcessor getFilterPostProcessor(){
+        return filters;
+    }
+
+    public void setFilterPostProcessor(FilterPostProcessor filters){
+        if(this.filters != null){
+            this.filters.removeFilter(compositor);
+        }
+
+        this.filters = filters;
+
+        if(filters != null){
+            filters.addFilter(compositor);
+        }
     }
 
     @Override
@@ -148,12 +163,16 @@ public class ObsidianAppState extends BaseAppState {
     @Override
     protected void onEnable() {
         getApplication().getInputManager().addRawInputListener(listener);
-        getApplication().getViewPort().addProcessor(filters);
+        if(filters != null){
+            filters.addFilter(compositor);
+        }
     }
 
     @Override
     protected void onDisable() {
         getApplication().getInputManager().removeRawInputListener(listener);
-        getApplication().getViewPort().removeProcessor(filters);
+        if(filters != null){
+            filters.removeFilter(compositor);
+        }
     }
 }

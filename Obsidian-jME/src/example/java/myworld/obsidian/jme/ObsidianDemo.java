@@ -7,6 +7,7 @@ import com.jme3.input.event.*;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
@@ -41,7 +42,10 @@ public class ObsidianDemo extends SimpleApplication {
         cam.setLocation(new Vector3f(0, 0, -10f));
         cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 
-        var obsidian = new ObsidianAppState();
+        var fpp = new FilterPostProcessor(assetManager);
+        getViewPort().addProcessor(fpp);
+
+        var obsidian = new ObsidianAppState(fpp);
         getStateManager().attach(obsidian);
         obsidian.getInputListener().setConsumeEvents(true);
 
