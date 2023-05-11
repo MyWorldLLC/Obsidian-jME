@@ -33,7 +33,6 @@ configurations {
 dependencies {
 
     api "com.myworldvw:obsidian:$obsidianVersion"
-    api "com.myworldvw:obsidian-jfx:$obsidianVersion"
 
     implementation "org.jmonkeyengine:jme3-desktop:$jmeVersion"
     implementation "org.jmonkeyengine:jme3-effects:$jmeVersion"
