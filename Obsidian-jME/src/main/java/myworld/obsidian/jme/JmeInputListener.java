@@ -111,7 +111,7 @@ public class JmeInputListener implements RawInputListener {
             consumeEvent(evt, uiEvt);
         }
 
-        uiEvt = ui.getInput().fireKeyEvent(mapKey(evt.getKeyCode()), evt.isPressed());
+        uiEvt = ui.getInput().fireKeyEvent(mapKey(evt.getKeyCode()), evt.isPressed() || evt.isRepeating());
         consumeEvent(evt, uiEvt);
     }
 
